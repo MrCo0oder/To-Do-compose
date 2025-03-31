@@ -2,7 +2,7 @@ package com.example.todo.data.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.util.Constants.TODO_TABLE
+import com.example.todo.util.Constants.TODO_TABLE
 
 @Entity(tableName =TODO_TABLE)
 data class ToDoTask(
