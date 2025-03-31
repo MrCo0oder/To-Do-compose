@@ -1,4 +1,4 @@
-package com.example.todo.data
+package com.example.todo.data.models
 
 import androidx.compose.ui.graphics.Color
 import com.example.todo.ui.theme.highPriorityColor
