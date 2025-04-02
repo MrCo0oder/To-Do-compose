@@ -99,6 +99,7 @@ fun ToDoTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = AppTypography,
+        shapes = Shapes,
         content = content
     )
 }

@@ -1,22 +1,25 @@
 package com.example.todo.ui.screens.list
 
 import android.annotation.SuppressLint
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.todo.R
+import com.example.todo.data.models.ToDoTask
+import com.example.todo.ui.components.EmptyContent
 import com.example.todo.ui.screens.SharedViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ListScreen(navigateToTaskScreen: (Int) -> Unit, sharedViewModel: SharedViewModel) {
+    LaunchedEffect(key1 = true) {
+        sharedViewModel.getAllTasks()
+    }
+    val tasks by sharedViewModel.allTasks.collectAsState()
     Scaffold(
         floatingActionButton = {
             TaskFloatingActionButton(navigateToTaskScreen)
@@ -29,15 +32,28 @@ fun ListScreen(navigateToTaskScreen: (Int) -> Unit, sharedViewModel: SharedViewM
             )
         },
     ) {
-
+        if (tasks.isEmpty())
+            EmptyContent()
+        else
+            ListContent(
+                tasks = tasks,
+                navigateToTaskScreen = navigateToTaskScreen,
+            )
     }
 }
 
-
 @Composable
-fun TaskFloatingActionButton(navigateToTaskScreen: (taskId: Int) -> Unit) {
-    FloatingActionButton(onClick = { navigateToTaskScreen(-1) }) {
-        Icon(imageVector = Icons.Filled.Add, contentDescription = stringResource(R.string.add_task))
+fun ListContent(
+    tasks: List<ToDoTask>,
+    navigateToTaskScreen: (Int) -> Unit,
+) {
+    LazyColumn {
+        items(tasks.size, key = { i -> tasks[i].id }) { i ->
+            TaskItem(
+                task = tasks[i],
+                navigateToTaskScreen = navigateToTaskScreen,
+            )
+        }
     }
 }
 
