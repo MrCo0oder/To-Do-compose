@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.todo"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material)
     //room
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
