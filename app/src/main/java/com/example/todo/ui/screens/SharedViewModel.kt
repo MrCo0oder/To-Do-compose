@@ -1,4 +1,4 @@
-package com.example.todo.ui
+package com.example.todo.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
