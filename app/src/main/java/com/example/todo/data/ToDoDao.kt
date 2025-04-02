@@ -24,7 +24,7 @@ interface ToDoDao {
     suspend fun updateTask(toDoTask: ToDoTask)
 
     @Delete
-    suspend fun deleteTask(taskId: Int)
+    suspend fun deleteTask(toDoTask: ToDoTask)
 
     @Query("DELETE FROM todo_table")
     suspend fun deleteAllTasks()

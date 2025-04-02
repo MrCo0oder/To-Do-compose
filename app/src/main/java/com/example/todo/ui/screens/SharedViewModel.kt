@@ -38,7 +38,7 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
 
     fun deleteTask(toDoTask: ToDoTask) {
         viewModelScope.launch {
-            repository.deleteTask(toDoTask.id)
+            repository.deleteTask(toDoTask)
         }
     }
 

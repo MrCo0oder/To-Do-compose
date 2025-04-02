@@ -1,27 +1,30 @@
 package com.example.todo.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.example.todo.ui.navigation.Screens.Companion.LIST_SCREEN
 import com.example.todo.ui.navigation.destinations.listComposable
 import com.example.todo.ui.navigation.destinations.taskComposable
+import com.example.todo.util.Action
 
 @Composable
 fun AppNavigation(
     navHostController: NavHostController,
 
     ) {
-    val screen = remember(navHostController) {
-        Screens(navHostController)
-    }
-    NavHost(navController = navHostController, startDestination = LIST_SCREEN) {
+
+    NavHost(navController = navHostController, startDestination =Screen.ListScreen()) {
         listComposable(
-            navigateToTaskScreen = screen.task
+            navigateToTaskScreen = {
+                navHostController.navigate(Screen.TaskScreen(it))
+            }
         )
         taskComposable(
-            navigateToListScreen = screen.list
+            navigateToListScreen ={
+                navHostController.navigate(Screen.ListScreen(it)){
+                    popUpTo(Screen.TaskScreen()){inclusive = true}
+                }
+            }
         )
     }
 }

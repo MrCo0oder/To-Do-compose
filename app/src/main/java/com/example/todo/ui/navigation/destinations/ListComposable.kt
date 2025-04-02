@@ -1,20 +1,14 @@
 package com.example.todo.ui.navigation.destinations
 
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.example.todo.ui.navigation.Screens.Companion.LIST_ARGUMENT_KEY
-import com.example.todo.ui.navigation.Screens.Companion.LIST_SCREEN
+import com.example.todo.ui.navigation.Screen
+import com.example.todo.ui.screens.list.ListScreen
 
 fun NavGraphBuilder.listComposable(
     navigateToTaskScreen: (Int) -> Unit
 ) {
-    composable(
-        route = LIST_SCREEN, arguments = listOf(navArgument(LIST_ARGUMENT_KEY) {
-            type = NavType.StringType
-        })
-    ) {
-//        ListScreen(navigateToTaskScreen = navigateToTaskScreen)
+    composable<Screen.ListScreen> {
+        ListScreen(navigateToTaskScreen = navigateToTaskScreen)
     }
 }
