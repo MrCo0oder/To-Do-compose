@@ -24,4 +24,58 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
         }
     }
 
+    fun addTask(toDoTask: ToDoTask) {
+        viewModelScope.launch {
+            repository.insertTask(toDoTask)
+        }
+    }
+
+    fun updateTask(toDoTask: ToDoTask) {
+        viewModelScope.launch {
+            repository.updateTask(toDoTask)
+        }
+    }
+
+    fun deleteTask(toDoTask: ToDoTask) {
+        viewModelScope.launch {
+            repository.deleteTask(toDoTask.id)
+        }
+    }
+
+    fun deleteAllTasks() {
+        viewModelScope.launch {
+            repository.deleteAllTasks()
+        }
+    }
+
+    fun searchDatabase(searchQuery: String) {
+        viewModelScope.launch {
+            repository.searchDatabase(searchQuery).collect { tasks ->
+                _allTasks.value = tasks
+            }
+        }
+    }
+    fun getSelectedTask(taskId: Int): StateFlow<ToDoTask?> {
+        val task = MutableStateFlow<ToDoTask?>(null)
+        viewModelScope.launch {
+            repository.getSelectedTask(taskId).collect { tasks ->
+                task.value = tasks
+            }
+        }
+        return task
+    }
+    fun sortByLowPriority() {
+        viewModelScope.launch {
+            repository.sortByLowPriority().collect { tasks ->
+                _allTasks.value = tasks
+            }
+        }
+    }
+    fun sortByHighPriority() {
+        viewModelScope.launch {
+            repository.sortByHighPriority().collect { tasks ->
+                _allTasks.value = tasks
+            }
+        }
+    }
 }
