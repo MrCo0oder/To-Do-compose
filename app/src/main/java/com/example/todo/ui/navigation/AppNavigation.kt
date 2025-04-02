@@ -5,7 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.todo.ui.navigation.destinations.listComposable
 import com.example.todo.ui.navigation.destinations.taskComposable
-import com.example.todo.util.Action
 
 @Composable
 fun AppNavigation(
