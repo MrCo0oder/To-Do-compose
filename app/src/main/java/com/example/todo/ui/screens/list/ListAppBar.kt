@@ -28,28 +28,53 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material.ContentAlpha
 import com.example.todo.R
 import com.example.todo.data.models.Priority
 import com.example.todo.ui.components.PriorityItem
+import com.example.todo.ui.screens.SharedViewModel
+import com.example.todo.util.TopBarState
 
 @Composable
-fun ListAppBar() {
-    var isSearchVisible by remember { mutableStateOf(false) }
-    if (isSearchVisible) {
-        SearchAppBar(
-            text = "",
-            onTextChange = {},
-            onCloseClicked = { isSearchVisible = false },
-            onSearchClicked = { isSearchVisible = false })
-    } else
-        DefaultAppBar(
-            onSearchClicked = { isSearchVisible = true },
-            onSortClicked = {},
-            onDeleteAllClicked = {}
-        )
+fun ListAppBar(
+    sharedViewModel: SharedViewModel,
+    topBarState: TopBarState,
+    searchTextState: String
+) {
+    when (topBarState) {
+        TopBarState.CLOSED -> {
+            DefaultAppBar(
+                onSearchClicked = {
+                    sharedViewModel.updateSearchAppBarState(TopBarState.OPENED)
+                },
+                onSortClicked = {
+                    when (it) {
+                        Priority.LOW -> sharedViewModel.sortByLowPriority()
+                        Priority.HIGH -> sharedViewModel.sortByHighPriority()
+                        else -> sharedViewModel.getAllTasks()
+                    }
+                },
+                onDeleteAllClicked = {
+                    sharedViewModel.deleteAllTasks()
+                }
+            )
+        }
+
+        else -> {
+            SearchAppBar(
+                text = searchTextState,
+                onTextChange = { sharedViewModel.updateSearchText(it) },
+                onCloseClicked = {
+                    sharedViewModel.updateSearchAppBarState(TopBarState.CLOSED)
+                    sharedViewModel.updateSearchText("")
+                },
+                onSearchClicked = {
+                })
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,7 +169,7 @@ fun DeleteAllAction(onActionClicked: () -> Unit) {
     IconButton(onClick = { expanded = true }) {
         Icon(
             imageVector = Icons.Filled.MoreVert,
-            contentDescription = "Delete All Button"
+            contentDescription = stringResource(R.string.delete_all_button)
         )
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
@@ -174,11 +199,16 @@ private fun SearchAppBar(
                 onValueChange = onTextChange,
                 placeholder = {
                     Text(
-                        text = "Search here...",
+                        text = stringResource(R.string.search_here),
                         color = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.alpha(ContentAlpha.medium),
                     )
                 },
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
+                    fontStyle = MaterialTheme.typography.titleMedium.fontStyle
+                ),
                 singleLine = true,
                 leadingIcon = {
                     Icon(

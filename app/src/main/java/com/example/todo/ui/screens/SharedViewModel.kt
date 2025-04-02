@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todo.data.models.ToDoTask
 import com.example.todo.data.repo.ToDoRepository
+import com.example.todo.util.TopBarState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -15,6 +16,22 @@ import javax.inject.Inject
 class SharedViewModel @Inject constructor(private val repository: ToDoRepository) : ViewModel() {
     private val _allTasks = MutableStateFlow<List<ToDoTask>>(emptyList())
     val allTasks: StateFlow<List<ToDoTask>> = _allTasks
+
+    private val searchAppBarState = MutableStateFlow(TopBarState.CLOSED)
+    val searchAppBarStateFlow: StateFlow<TopBarState> = searchAppBarState
+
+    private val searchText = MutableStateFlow("")
+    val searchTextFlow: StateFlow<String> = searchText
+
+
+    fun updateSearchText(query: String) {
+        searchText.value = query
+    }
+
+    fun updateSearchAppBarState(topBarState: TopBarState) {
+        searchAppBarState.value = topBarState
+    }
+
 
     fun getAllTasks() {
         viewModelScope.launch {
@@ -55,6 +72,7 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
             }
         }
     }
+
     fun getSelectedTask(taskId: Int): StateFlow<ToDoTask?> {
         val task = MutableStateFlow<ToDoTask?>(null)
         viewModelScope.launch {
@@ -64,6 +82,7 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
         }
         return task
     }
+
     fun sortByLowPriority() {
         viewModelScope.launch {
             repository.sortByLowPriority().collect { tasks ->
@@ -71,6 +90,7 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
             }
         }
     }
+
     fun sortByHighPriority() {
         viewModelScope.launch {
             repository.sortByHighPriority().collect { tasks ->

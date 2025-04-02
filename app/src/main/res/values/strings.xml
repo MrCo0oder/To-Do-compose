@@ -4,4 +4,6 @@
     <string name="tasks">Tasks</string>
     <string name="search_button">Search button</string>
     <string name="delete_all">Delete All</string>
+    <string name="delete_all_button">Delete All Button</string>
+    <string name="search_here">Search here...</string>
 </resources>
