@@ -67,6 +67,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     //serialization
     implementation(libs.kotlinx.serialization.json)
+    //lottie
+    implementation(libs.lottie.compose)
 
 
     //testing

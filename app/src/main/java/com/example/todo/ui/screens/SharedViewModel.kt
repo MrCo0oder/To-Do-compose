@@ -2,21 +2,20 @@ package com.example.todo.ui.screens
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.todo.data.models.Priority
 import com.example.todo.data.models.ToDoTask
 import com.example.todo.data.repo.ToDoRepository
+import com.example.todo.util.RequestState
 import com.example.todo.util.TopBarState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SharedViewModel @Inject constructor(private val repository: ToDoRepository) : ViewModel() {
-    private val _allTasks = MutableStateFlow<List<ToDoTask>>(emptyList())
-    val allTasks: StateFlow<List<ToDoTask>> = _allTasks
+    private val _allTasks = MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
+    val allTasks: StateFlow<RequestState<List<ToDoTask>>> = _allTasks
 
     private val searchAppBarState = MutableStateFlow(TopBarState.CLOSED)
     val searchAppBarStateFlow: StateFlow<TopBarState> = searchAppBarState
@@ -35,10 +34,15 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
 
 
     fun getAllTasks() {
-        viewModelScope.launch {
-            repository.getAllTasks().collect { tasks ->
-                _allTasks.value = tasks
+        _allTasks.value = RequestState.Loading
+        try {
+            viewModelScope.launch {
+                repository.getAllTasks().collect { tasks ->
+                    _allTasks.value = RequestState.Success(tasks)
+                }
             }
+        } catch (e: Exception) {
+            _allTasks.value = RequestState.Error(e)
         }
     }
 
@@ -67,9 +71,10 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
     }
 
     fun searchDatabase(searchQuery: String) {
+        _allTasks.value = RequestState.Loading
         viewModelScope.launch {
             repository.searchDatabase(searchQuery).collect { tasks ->
-                _allTasks.value = tasks
+                _allTasks.value = RequestState.Success(tasks)
             }
         }
     }
@@ -85,17 +90,19 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
     }
 
     fun sortByLowPriority() {
+        _allTasks.value = RequestState.Loading
         viewModelScope.launch {
             repository.sortByLowPriority().collect { tasks ->
-                _allTasks.value = tasks
+                _allTasks.value = RequestState.Success(tasks)
             }
         }
     }
 
     fun sortByHighPriority() {
+        _allTasks.value = RequestState.Loading
         viewModelScope.launch {
             repository.sortByHighPriority().collect { tasks ->
-                _allTasks.value = tasks
+                _allTasks.value = RequestState.Success(tasks)
             }
         }
     }
