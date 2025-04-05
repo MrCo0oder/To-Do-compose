@@ -6,4 +6,8 @@
     <string name="delete_all">Delete All</string>
     <string name="delete_all_button">Delete All Button</string>
     <string name="search_here">Search here...</string>
+    <string name="add_new_task">Add New Task</string>
+    <string name="back_button">Back Button</string>
+    <string name="delete_task">Delete Task</string>
+    <string name="drop_down_arrow">Drop Down Arrow</string>
 </resources>

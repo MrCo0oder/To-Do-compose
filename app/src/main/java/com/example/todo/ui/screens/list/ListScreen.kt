@@ -1,6 +1,7 @@
 package com.example.todo.ui.screens.list
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,11 +47,13 @@ fun ListScreen(navigateToTaskScreen: (Int) -> Unit, sharedViewModel: SharedViewM
             is RequestState.Success -> {
                 if ((tasks as RequestState.Success<List<ToDoTask>>).data.isEmpty())
                     EmptyContent()
-                else
+                else {
+                    Log.d("ListScreen: ", (tasks as RequestState.Success<List<ToDoTask>>).data.toString())
                     ListContent(
                         tasks = (tasks as RequestState.Success<List<ToDoTask>>).data,
                         navigateToTaskScreen = navigateToTaskScreen,
                     )
+                }
             }
 
             is RequestState.Error -> {

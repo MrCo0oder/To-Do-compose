@@ -14,10 +14,11 @@ import androidx.compose.ui.unit.dp
 import com.example.todo.data.models.Priority
 
 @Composable
-fun PriorityItem(priority: Priority) {
+fun PriorityItem(priority: Priority, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = CenterVertically,
-        horizontalArrangement = spacedBy(12.dp)
+        horizontalArrangement = spacedBy(12.dp),
+        modifier = modifier
     ) {
         Canvas(Modifier.size(16.dp)) {
             drawCircle(color = priority.color)
