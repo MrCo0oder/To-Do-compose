@@ -14,4 +14,4 @@ val extraSmallIconSize = 8.dp
 
 
 val topAppBarHeight = 56.dp
-val priorityDropDownHeight = 60.dp
+val priorityDropDownHeight = 70.dp

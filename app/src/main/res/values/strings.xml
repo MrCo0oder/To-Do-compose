@@ -10,4 +10,6 @@
     <string name="back_button">Back Button</string>
     <string name="delete_task">Delete Task</string>
     <string name="drop_down_arrow">Drop Down Arrow</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
 </resources>

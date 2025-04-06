@@ -1,19 +1,20 @@
 package com.example.todo.ui.components
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,91 +23,146 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.todo.R
 import com.example.todo.data.models.Priority
+import com.example.todo.ui.theme.Shapes
 import com.example.todo.util.mediumPadding
-import com.example.todo.util.priorityDropDownHeight
+import com.example.todo.util.smallPadding
 
 @Composable
 fun PriorityDropDown(
     priority: Priority,
+    modifier: Modifier = Modifier,
     onPrioritySelected: (Priority) -> Unit
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    val angle: Float by animateFloatAsState(
-        targetValue = if (expanded) -180f else 0f
-    )
-
+    var mExpanded by remember { mutableStateOf(false) }
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(priorityDropDownHeight)
-            .clickable { expanded = true }
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.background, Shapes.large)
+            .wrapContentHeight()
             .border(
                 1.dp,
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-                MaterialTheme.shapes.large
+                color = if (mExpanded) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                shape = Shapes.large
             ),
     ) {
-        PriorityItem(
-            priority = priority,
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = mediumPadding)
-        )
-        IconButton(
-            {
-                expanded = true
-            }, modifier = Modifier
-                .alpha(0.6f)
-                .rotate(angle)
+        Column(
+            Modifier.padding(vertical = 13.dp, horizontal = mediumPadding),
+            verticalArrangement = Arrangement.spacedBy(13.dp)
         ) {
-            Icon(
-                imageVector = Icons.Filled.ArrowDropDown,
-                tint = MaterialTheme.colorScheme.onBackground,
-                contentDescription = stringResource(R.string.drop_down_arrow)
-            )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                Modifier.fillMaxWidth(),
-                containerColor = MaterialTheme.colorScheme.background
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(Shapes.large)
+                    .clickable { mExpanded = !mExpanded },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                DropdownMenuItem(
-                    onClick = {
-                        expanded = false
-                        onPrioritySelected(Priority.LOW)
-                    },
-                    text = { PriorityItem(priority = Priority.LOW) }
+                PriorityItem(
+                    priority = priority,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = mediumPadding)
                 )
-                DropdownMenuItem(
-                    onClick = {
-                        expanded = false
-                        onPrioritySelected(Priority.HIGH)
-                    },
-                    text = { PriorityItem(priority = Priority.HIGH) }
-                )
-                DropdownMenuItem(
-                    onClick = {
-                        expanded = false
-                        onPrioritySelected(Priority.MEDIUM)
-                    },
-                    text = { PriorityItem(priority = Priority.MEDIUM) }
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.rotate(if (mExpanded) -180f else 0f)
                 )
             }
+            AnimatedVisibility(visible = mExpanded) {
+                Column(
+                    Modifier
+                        .padding(horizontal = smallPadding),
+                    verticalArrangement = Arrangement.spacedBy(13.dp)
+                ) {
+                    HDivider(color = MaterialTheme.colorScheme.primary)
+                    PriorityItem(
+                        priority = Priority.LOW,
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .clip(Shapes.large)
+                            .fillMaxWidth()
+                            .apply {
+                                if (priority == Priority.LOW) {
+                                    background(
+                                        MaterialTheme.colorScheme.primary.copy(0.2f),
+                                        Shapes.large
+                                    )
+                                }
+                            }
+                            .clickable {
+                                onPrioritySelected(Priority.LOW)
+                                mExpanded = false
+                            }
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
+                    HDivider(color = MaterialTheme.colorScheme.primary)
+                    PriorityItem(
+                        priority = Priority.MEDIUM,
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth()
+                            .apply {
+                                if (priority == Priority.MEDIUM) {
+                                    background(
+                                        MaterialTheme.colorScheme.primary.copy(0.2f),
+                                        Shapes.large
+                                    )
+                                }
+                            }
+                            .clickable {
+                                onPrioritySelected(Priority.MEDIUM)
+                                mExpanded = false
+                            }
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
+                    HDivider(color = MaterialTheme.colorScheme.primary)
+                    PriorityItem(
+                        priority = Priority.HIGH,
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .clip(Shapes.large)
+                            .fillMaxWidth()
+                            .apply {
+                                if (priority == Priority.HIGH) {
+                                    background(
+                                        MaterialTheme.colorScheme.primary.copy(0.2f),
+                                        Shapes.large
+                                    )
+                                }
+                            }
+                            .clickable {
+                                onPrioritySelected(Priority.HIGH)
+                                mExpanded = false
+                            }
+                            .padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
+                }
+            }
+
         }
     }
 }
 
 @Composable
+fun HDivider(modifier: Modifier = Modifier, color: Color = Color.LightGray) {
+    Box(
+        modifier = modifier
+            .background(color)
+            .height(1.dp)
+            .fillMaxWidth()
+    )
+}
+
+@Composable
 @Preview
-fun PriorityDropDownPreview() {
-    PriorityDropDown(priority = Priority.LOW, onPrioritySelected = {})
+fun CustomDropDownPreview() {
+    PriorityDropDown(Priority.HIGH, onPrioritySelected = {})
 }
