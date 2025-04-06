@@ -2,20 +2,16 @@ package com.example.todo.ui.screens.list
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.todo.data.models.ToDoTask
 import com.example.todo.ui.components.EmptyContent
@@ -48,8 +44,12 @@ fun ListScreen(navigateToTaskScreen: (Int) -> Unit, sharedViewModel: SharedViewM
                 if ((tasks as RequestState.Success<List<ToDoTask>>).data.isEmpty())
                     EmptyContent()
                 else {
-                    Log.d("ListScreen: ", (tasks as RequestState.Success<List<ToDoTask>>).data.toString())
+                    Log.d(
+                        "ListScreen: ",
+                        (tasks as RequestState.Success<List<ToDoTask>>).data.toString()
+                    )
                     ListContent(
+                        paddingValues = it,
                         tasks = (tasks as RequestState.Success<List<ToDoTask>>).data,
                         navigateToTaskScreen = navigateToTaskScreen,
                     )
@@ -73,8 +73,9 @@ fun ListScreen(navigateToTaskScreen: (Int) -> Unit, sharedViewModel: SharedViewM
 fun ListContent(
     tasks: List<ToDoTask>,
     navigateToTaskScreen: (Int) -> Unit,
+    paddingValues: PaddingValues,
 ) {
-    LazyColumn {
+    LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
         items(tasks.size, key = { i -> tasks[i].id }) { i ->
             TaskItem(
                 task = tasks[i],

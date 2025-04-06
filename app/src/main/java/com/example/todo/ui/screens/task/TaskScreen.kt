@@ -1,6 +1,5 @@
 package com.example.todo.ui.screens.task
 
-//import com.example.todo.ui.components.PriorityDropDown
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,6 +25,7 @@ import com.example.todo.ui.components.ErrorContent
 import com.example.todo.ui.components.LoadingContent
 import com.example.todo.ui.components.PriorityDropDown
 import com.example.todo.ui.screens.SharedViewModel
+import com.example.todo.ui.screens.TaskScreenEvent
 import com.example.todo.ui.theme.Shapes
 import com.example.todo.util.Action
 import com.example.todo.util.RequestState
@@ -39,7 +41,6 @@ fun TaskScreen(
     when (toDoTaskState) {
 
         is RequestState.Success -> {
-
             Scaffold(
                 topBar = {
                     TaskAppBar(
@@ -48,15 +49,63 @@ fun TaskScreen(
                     )
                 }, content =
                 {
-                    toDoTaskState.data?.let { toDoTask ->
+                    val task = sharedViewModel.taskFlow.collectAsState().value
+
+                    if (toDoTaskState.data != null) {
+                        val toDoTask = toDoTaskState.data
+                        LaunchedEffect(key1 = Unit) {
+                            sharedViewModel.setSelectedTask(toDoTask)
+                        }
                         TaskContent(
                             paddingValues = it,
-                            title = toDoTask.title,
-                            onTitleChange = { /*sharedViewModel.updateTitle(it)*/ },
-                            description = toDoTask.description,
-                            onDescriptionChange = { /*sharedViewModel.updateDescription(it)*/ },
-                            priority = toDoTask.priority,
-                            onPrioritySelected = { /*sharedViewModel.updatePriority(it)*/ },
+                            title = task?.title ?: toDoTask.title,
+                            onTitleChange = { title ->
+                                sharedViewModel.onEvent(
+                                    TaskScreenEvent.SetTitle(
+                                        title
+                                    )
+                                )
+                            },
+                            description = task?.description ?: toDoTask.description,
+                            onDescriptionChange = { description ->
+                                sharedViewModel.onEvent(
+                                    TaskScreenEvent.SetDescription(
+                                        description
+                                    )
+                                )
+                            },
+                            priority = task?.priority ?: toDoTask.priority,
+                            onPrioritySelected = { priority ->
+                                sharedViewModel.onEvent(
+                                    TaskScreenEvent.SetPriority(
+                                        priority
+                                    )
+                                )
+                            },
+                        )
+                    } else {
+                        TaskContent(
+                            paddingValues = it,
+                            title = task?.title ?: "",
+                            onTitleChange = { title ->
+                                sharedViewModel.onEvent(
+                                    TaskScreenEvent.SetTitle(
+                                        title
+                                    )
+                                )
+                            },
+                            description = task?.description ?: "",
+                            onDescriptionChange = { description ->
+                                sharedViewModel.onEvent(
+                                    TaskScreenEvent.SetDescription(description)
+                                )
+                            },
+                            priority = task?.priority ?: Priority.LOW,
+                            onPrioritySelected = { priority ->
+                                sharedViewModel.onEvent(
+                                    TaskScreenEvent.SetPriority(priority)
+                                )
+                            },
                         )
                     }
                 })
