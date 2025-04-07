@@ -75,7 +75,12 @@ fun ListContent(
     navigateToTaskScreen: (Int) -> Unit,
     paddingValues: PaddingValues,
 ) {
-    LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+    LazyColumn(
+        modifier = Modifier.padding(
+            top = paddingValues.calculateTopPadding(),
+            bottom = paddingValues.calculateBottomPadding()
+        )
+    ) {
         items(tasks.size, key = { i -> tasks[i].id }) { i ->
             TaskItem(
                 task = tasks[i],

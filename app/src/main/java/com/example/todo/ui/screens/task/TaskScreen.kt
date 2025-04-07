@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +39,7 @@ fun TaskScreen(
     sharedViewModel: SharedViewModel,
     toDoTaskState: RequestState<ToDoTask?>,
 ) {
+    val task by sharedViewModel.taskFlow.collectAsState()
     when (toDoTaskState) {
 
         is RequestState.Success -> {
@@ -47,67 +49,14 @@ fun TaskScreen(
                         selectedTask = toDoTaskState.data,
                         navigateToListScreen = navigateToListScreen
                     )
-                }, content =
-                {
-                    val task = sharedViewModel.taskFlow.collectAsState().value
-
-                    if (toDoTaskState.data != null) {
-                        val toDoTask = toDoTaskState.data
-                        LaunchedEffect(key1 = Unit) {
-                            sharedViewModel.setSelectedTask(toDoTask)
-                        }
-                        TaskContent(
-                            paddingValues = it,
-                            title = task?.title ?: toDoTask.title,
-                            onTitleChange = { title ->
-                                sharedViewModel.onEvent(
-                                    TaskScreenEvent.SetTitle(
-                                        title
-                                    )
-                                )
-                            },
-                            description = task?.description ?: toDoTask.description,
-                            onDescriptionChange = { description ->
-                                sharedViewModel.onEvent(
-                                    TaskScreenEvent.SetDescription(
-                                        description
-                                    )
-                                )
-                            },
-                            priority = task?.priority ?: toDoTask.priority,
-                            onPrioritySelected = { priority ->
-                                sharedViewModel.onEvent(
-                                    TaskScreenEvent.SetPriority(
-                                        priority
-                                    )
-                                )
-                            },
-                        )
-                    } else {
-                        TaskContent(
-                            paddingValues = it,
-                            title = task?.title ?: "",
-                            onTitleChange = { title ->
-                                sharedViewModel.onEvent(
-                                    TaskScreenEvent.SetTitle(
-                                        title
-                                    )
-                                )
-                            },
-                            description = task?.description ?: "",
-                            onDescriptionChange = { description ->
-                                sharedViewModel.onEvent(
-                                    TaskScreenEvent.SetDescription(description)
-                                )
-                            },
-                            priority = task?.priority ?: Priority.LOW,
-                            onPrioritySelected = { priority ->
-                                sharedViewModel.onEvent(
-                                    TaskScreenEvent.SetPriority(priority)
-                                )
-                            },
-                        )
-                    }
+                }, content = {
+                    val selectedTask = toDoTaskState.data
+                    TaskScreenContent(
+                        selectedTask = selectedTask,
+                        task = task,
+                        sharedViewModel = sharedViewModel,
+                        navigateToListScreen = navigateToListScreen
+                    )
                 })
         }
 
@@ -123,6 +72,51 @@ fun TaskScreen(
     }
 
 
+}
+
+@Composable
+fun TaskScreenContent(
+    selectedTask: ToDoTask?,
+    task: ToDoTask?,
+    sharedViewModel: SharedViewModel,
+    navigateToListScreen: (Action) -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            TaskAppBar(
+                selectedTask = selectedTask,
+                navigateToListScreen = navigateToListScreen
+            )
+        },
+    ) { paddingValues ->
+        LaunchedEffect(key1 = selectedTask) {
+            if (selectedTask != null) {
+                sharedViewModel.setSelectedTask(selectedTask)
+            }
+        }
+
+        val currentTask = task ?: ToDoTask(
+            title = "",
+            description = "",
+            priority = Priority.LOW
+        )
+
+        TaskContent(
+            paddingValues = paddingValues,
+            title = currentTask.title,
+            onTitleChange = { title ->
+                sharedViewModel.onEvent(TaskScreenEvent.SetTitle(title))
+            },
+            description = currentTask.description,
+            onDescriptionChange = { description ->
+                sharedViewModel.onEvent(TaskScreenEvent.SetDescription(description))
+            },
+            priority = currentTask.priority,
+            onPrioritySelected = { priority ->
+                sharedViewModel.onEvent(TaskScreenEvent.SetPriority(priority))
+            },
+        )
+    }
 }
 
 @Composable
@@ -176,7 +170,6 @@ fun TaskContent(
                 .padding(smallPadding)
                 .fillMaxWidth()
                 .padding(smallPadding),
-//            placeholder = { Text(text = "Enter Description") },
             shape = Shapes.large,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
