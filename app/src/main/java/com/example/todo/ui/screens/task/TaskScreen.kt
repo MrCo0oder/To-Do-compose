@@ -35,9 +35,9 @@ import com.example.todo.util.smallPadding
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TaskScreen(
-    navigateToListScreen: (Action) -> Unit,
     sharedViewModel: SharedViewModel,
     toDoTaskState: RequestState<ToDoTask?>,
+    navigateToListScreen: (Action) -> Unit,
 ) {
     val task by sharedViewModel.taskFlow.collectAsState()
     when (toDoTaskState) {
