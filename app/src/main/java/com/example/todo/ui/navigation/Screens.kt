@@ -1,6 +1,5 @@
 package com.example.todo.ui.navigation
 
-import com.example.todo.util.Action
 import kotlinx.serialization.Serializable
 
 sealed class Screen {

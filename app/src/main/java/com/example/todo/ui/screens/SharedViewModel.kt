@@ -213,6 +213,10 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
             }
         }
     }
+
+    fun validateFields(): Boolean =
+        _selectedTask.value?.title != "" && _selectedTask.value?.description != ""
+
 }
 
 sealed class TaskScreenEvent {
