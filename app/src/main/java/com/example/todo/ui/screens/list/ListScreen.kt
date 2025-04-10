@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.todo.data.models.ToDoTask
@@ -20,10 +17,8 @@ import com.example.todo.ui.components.EmptyContent
 import com.example.todo.ui.components.ErrorContent
 import com.example.todo.ui.components.LoadingContent
 import com.example.todo.ui.screens.SharedViewModel
-import com.example.todo.util.Action
 import com.example.todo.util.RequestState
 import com.example.todo.util.TopBarState
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -144,35 +139,6 @@ fun ListContent(
         }
     }
 }
-//
-//@Composable
-//fun DisplaySnackBar(
-//    scaffoldState: SnackbarHostState,
-//    handleDatabaseActions: () -> Unit,
-//    taskTitle: String,
-//    action: Action
-//) {
-//    handleDatabaseActions()
-//    val scope = rememberCoroutineScope()
-//    LaunchedEffect(action) {
-//        if (action != Action.NoAction) {
-//            scope.launch {
-//                val result = scaffoldState.showSnackbar(
-//                    message = "${action.name}: $taskTitle",
-//                    actionLabel = "OK"
-//                )
-//                when (result) {
-//                    SnackbarResult.ActionPerformed -> {
-//
-//                    }
-//
-//                    SnackbarResult.Dismissed -> {
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 
 @Composable
 @Preview
