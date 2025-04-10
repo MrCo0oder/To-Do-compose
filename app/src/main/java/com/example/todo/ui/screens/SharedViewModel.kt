@@ -182,6 +182,10 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
         _selectedTask.value =
             ToDoTask(title = "", description = "", priority = Priority.LOW)
     }
+
+    fun validateFields(): Boolean =
+        _selectedTask.value?.title != "" && _selectedTask.value?.description != ""
+
 }
 
 sealed class TaskScreenEvent {

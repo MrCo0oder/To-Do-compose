@@ -1,6 +1,8 @@
 package com.example.todo.ui.screens.task
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,10 +38,11 @@ import com.example.todo.util.smallPadding
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun TaskScreen(
-    navigateToListScreen: (Action) -> Unit,
     sharedViewModel: SharedViewModel,
     toDoTaskState: RequestState<ToDoTask?>,
+    navigateToListScreen: (Action) -> Unit,
 ) {
+    val context = LocalContext.current
     val task by sharedViewModel.taskFlow.collectAsState()
     when (toDoTaskState) {
 
@@ -47,8 +51,17 @@ fun TaskScreen(
                 topBar = {
                     TaskAppBar(
                         selectedTask = toDoTaskState.data,
-                        navigateToListScreen = navigateToListScreen
-                    )
+                    ) { action ->
+                        if (action == Action.NoAction) {
+                            navigateToListScreen(action)
+                            return@TaskAppBar
+                        }
+                        if (sharedViewModel.validateFields()) {
+                            navigateToListScreen(action)
+                        } else {
+                            displayToast(context = context, message = "Fields Empty")
+                        }
+                    }
                 }, content = {
                     val selectedTask = toDoTaskState.data
                     TaskScreenContent(
@@ -72,6 +85,10 @@ fun TaskScreen(
     }
 
 
+}
+
+fun displayToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
 
 @Composable

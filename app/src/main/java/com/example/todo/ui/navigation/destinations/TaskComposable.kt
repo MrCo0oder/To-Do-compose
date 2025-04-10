@@ -15,15 +15,15 @@ fun NavGraphBuilder.taskComposable(
     sharedViewModel: SharedViewModel
 ) {
     composable<Screen.TaskScreen> {
-       val taskId = it.toRoute<Screen.TaskScreen>().id
+        val taskId = it.toRoute<Screen.TaskScreen>().id
         val selectedTaskState = sharedViewModel.selectedTask.collectAsState().value
-        LaunchedEffect(key1 = taskId){
+        LaunchedEffect(key1 = taskId) {
             sharedViewModel.getSelectedTask(taskId)
         }
         TaskScreen(
-            navigateToListScreen = navigateToListScreen,
             sharedViewModel = sharedViewModel,
-            toDoTaskState = selectedTaskState
+            toDoTaskState = selectedTaskState,
+            navigateToListScreen = navigateToListScreen
         )
     }
 }
