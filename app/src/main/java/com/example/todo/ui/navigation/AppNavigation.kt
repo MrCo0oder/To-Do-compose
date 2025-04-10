@@ -12,9 +12,9 @@ import com.example.todo.ui.screens.SharedViewModel
 fun AppNavigation(
     navHostController: NavHostController,
     sharedViewModel: SharedViewModel,
-    ) {
+) {
 
-    NavHost(navController = navHostController, startDestination =Screen.ListScreen()) {
+    NavHost(navController = navHostController, startDestination = Screen.ListScreen()) {
         listComposable(
             sharedViewModel = sharedViewModel,
             navigateToTaskScreen = {
@@ -23,9 +23,9 @@ fun AppNavigation(
         )
         taskComposable(
             sharedViewModel = sharedViewModel,
-            navigateToListScreen ={
-                navHostController.navigate(Screen.ListScreen(it)){
-                    popUpTo(Screen.TaskScreen()){inclusive = true}
+            navigateToListScreen = {
+                navHostController.navigate(Screen.ListScreen(it)) {
+                    popUpTo(Screen.TaskScreen()) { inclusive = true }
                 }
             }
         )

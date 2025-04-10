@@ -49,19 +49,19 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
         }
     }
 
-    fun addTask(toDoTask: ToDoTask) {
+    private fun addTask(toDoTask: ToDoTask) {
         viewModelScope.launch {
             repository.insertTask(toDoTask)
         }
     }
 
-    fun updateTask(toDoTask: ToDoTask) {
+    private fun updateTask(toDoTask: ToDoTask) {
         viewModelScope.launch {
             repository.updateTask(toDoTask)
         }
     }
 
-    fun deleteTask(toDoTask: ToDoTask) {
+    private fun deleteTask(toDoTask: ToDoTask) {
         viewModelScope.launch {
             repository.deleteTask(toDoTask)
         }
@@ -142,76 +142,45 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
                     _selectedTask.value?.copy(priority = event.priority)
                 }
             }
-
-            TaskScreenEvent.SaveTask -> {
-                _selectedTask.value?.let {
-                    viewModelScope.launch {
-                        repository.updateTask(it)
-                    }
-                }
-            }
-
-            TaskScreenEvent.DeleteTask -> {
-                _selectedTask.value?.let {
-                    viewModelScope.launch {
-                        repository.deleteTask(it)
-                    }
-                }
-            }
         }
     }
 
     fun onAction(action: Action) {
         when (action) {
             Action.NoAction -> {
-                _selectedTask.value =
-                    ToDoTask(title = "", description = "", priority = Priority.LOW)
+                resetTask()
             }
 
             Action.Add -> {
                 _selectedTask.value?.let {
-                    viewModelScope.launch {
-                        repository.insertTask(it)
-                    }
+                    addTask(it)
                 }
-                _selectedTask.value =
-                    ToDoTask(title = "", description = "", priority = Priority.LOW)
+                resetTask()
             }
 
             Action.Delete -> {
                 _selectedTask.value?.let {
-                    viewModelScope.launch {
-                        repository.deleteTask(it)
-                    }
+                    deleteTask(it)
                 }
+                resetTask()
             }
 
             Action.Update -> {
                 _selectedTask.value?.let {
-                    viewModelScope.launch {
-                        repository.updateTask(it)
-                    }
+                    updateTask(it)
                 }
-                _selectedTask.value =
-                    ToDoTask(title = "", description = "", priority = Priority.LOW)
+                resetTask()
             }
 
             Action.DeleteAll -> {
-                viewModelScope.launch {
-                    repository.deleteAllTasks()
-                }
-                _selectedTask.value =
-                    ToDoTask(title = "", description = "", priority = Priority.LOW)
-            }
-
-            Action.Undo -> {
-                _selectedTask.value?.let {
-                    viewModelScope.launch {
-                        repository.insertTask(it)
-                    }
-                }
+                deleteAllTasks()
             }
         }
+    }
+
+    private fun resetTask() {
+        _selectedTask.value =
+            ToDoTask(title = "", description = "", priority = Priority.LOW)
     }
 }
 
@@ -219,6 +188,4 @@ sealed class TaskScreenEvent {
     data class SetTitle(val title: String) : TaskScreenEvent()
     data class SetDescription(val description: String) : TaskScreenEvent()
     data class SetPriority(val priority: Priority) : TaskScreenEvent()
-    object SaveTask : TaskScreenEvent()
-    object DeleteTask : TaskScreenEvent()
 }
