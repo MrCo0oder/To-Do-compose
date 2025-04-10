@@ -52,7 +52,7 @@ fun TaskScreen(
                     TaskAppBar(
                         selectedTask = toDoTaskState.data,
                     ) { action ->
-                        if (action == Action.NoAction) {
+                        if (action == Action.NoAction || action == Action.Delete || action == Action.DeleteAll) {
                             navigateToListScreen(action)
                             return@TaskAppBar
                         }

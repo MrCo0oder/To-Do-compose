@@ -9,6 +9,7 @@ import com.example.todo.util.Action
 import com.example.todo.util.RequestState
 import com.example.todo.util.TopBarState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -25,6 +26,9 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
 
     private val searchText = MutableStateFlow("")
     val searchTextFlow: StateFlow<String> = searchText
+
+    private val _searchTasks = MutableStateFlow<RequestState<List<ToDoTask>>>(RequestState.Idle)
+    val searchTasks: StateFlow<RequestState<List<ToDoTask>>> = _searchTasks
 
 
     fun updateSearchText(query: String) {
@@ -59,6 +63,7 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
         viewModelScope.launch {
             repository.updateTask(toDoTask)
         }
+        searchAppBarState.value = TopBarState.CLOSED
     }
 
     private fun deleteTask(toDoTask: ToDoTask) {
@@ -68,18 +73,23 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
     }
 
     fun deleteAllTasks() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteAllTasks()
         }
     }
 
     fun searchDatabase(searchQuery: String) {
-        _allTasks.value = RequestState.Loading
-        viewModelScope.launch {
-            repository.searchDatabase(searchQuery).collect { tasks ->
-                _allTasks.value = RequestState.Success(tasks)
+        _searchTasks.value = RequestState.Loading
+        try {
+            viewModelScope.launch {
+                repository.searchDatabase("%$searchQuery%").collect { searchTasks ->
+                    _searchTasks.value = RequestState.Success(searchTasks)
+                }
             }
+        } catch (e: Exception) {
+            _searchTasks.value = RequestState.Error(e)
         }
+        searchAppBarState.value = TopBarState.TRIGGERED
     }
 
     private val _task = MutableStateFlow<RequestState<ToDoTask?>>(RequestState.Idle)

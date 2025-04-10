@@ -22,6 +22,7 @@ import com.example.todo.ui.components.LoadingContent
 import com.example.todo.ui.screens.SharedViewModel
 import com.example.todo.util.Action
 import com.example.todo.util.RequestState
+import com.example.todo.util.TopBarState
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -34,6 +35,7 @@ fun ListScreen(
         sharedViewModel.getAllTasks()
     }
     val tasks by sharedViewModel.allTasks.collectAsState()
+    val searchTasks by sharedViewModel.searchTasks.collectAsState()
     Scaffold(
         floatingActionButton = {
             TaskFloatingActionButton(navigateToTaskScreen)
@@ -46,32 +48,78 @@ fun ListScreen(
             )
         },
     ) {
-        when (tasks) {
-            is RequestState.Success -> {
-                if ((tasks as RequestState.Success<List<ToDoTask>>).data.isEmpty())
-                    EmptyContent()
-                else {
-                    Log.d(
-                        "ListScreen: ",
-                        (tasks as RequestState.Success<List<ToDoTask>>).data.toString()
-                    )
-                    ListContent(
-                        paddingValues = it,
-                        tasks = (tasks as RequestState.Success<List<ToDoTask>>).data,
-                        navigateToTaskScreen = navigateToTaskScreen,
-                    )
-                }
-            }
+        if (sharedViewModel.searchAppBarStateFlow.collectAsState().value == TopBarState.TRIGGERED)
+            HandleSearchTasks(
+                searchTasks = searchTasks,
+                navigateToTaskScreen = navigateToTaskScreen,
+                paddingValues = it
+            )
+        else
+            HandleRegularList(tasks, it, navigateToTaskScreen, sharedViewModel)
+    }
+}
 
-            is RequestState.Error -> {
-                ErrorContent(message = (tasks as RequestState.Error).exception.message.toString()) {
-                    sharedViewModel.getAllTasks()
-                }
+@Composable
+private fun HandleRegularList(
+    tasks: RequestState<List<ToDoTask>>,
+    it: PaddingValues,
+    navigateToTaskScreen: (Int) -> Unit,
+    sharedViewModel: SharedViewModel
+) {
+    when (tasks) {
+        is RequestState.Success -> {
+            if (tasks.data.isEmpty())
+                EmptyContent()
+            else {
+                Log.d(
+                    "ListScreen: ",
+                    tasks.data.toString()
+                )
+                ListContent(
+                    paddingValues = it,
+                    tasks = tasks.data,
+                    navigateToTaskScreen = navigateToTaskScreen,
+                )
             }
+        }
 
-            else -> {
-                LoadingContent()
+        is RequestState.Error -> {
+            ErrorContent(message = tasks.exception.message.toString()) {
+                sharedViewModel.getAllTasks()
             }
+        }
+
+        else -> {
+            LoadingContent()
+        }
+    }
+}
+
+@Composable
+fun HandleSearchTasks(
+    searchTasks: RequestState<List<ToDoTask>>,
+    navigateToTaskScreen: (Int) -> Unit,
+    paddingValues: PaddingValues,
+) {
+    when (searchTasks) {
+        is RequestState.Success -> {
+            if (searchTasks.data.isEmpty())
+                EmptyContent()
+            else
+                ListContent(
+                    paddingValues = paddingValues,
+                    tasks = searchTasks.data,
+                    navigateToTaskScreen = navigateToTaskScreen,
+                )
+        }
+
+        is RequestState.Error -> {
+            ErrorContent(message = searchTasks.exception.message.toString()) {
+            }
+        }
+
+        else -> {
+            LoadingContent()
         }
     }
 }
@@ -96,35 +144,35 @@ fun ListContent(
         }
     }
 }
-
-@Composable
-fun DisplaySnackBar(
-    scaffoldState: SnackbarHostState,
-    handleDatabaseActions: () -> Unit,
-    taskTitle: String,
-    action: Action
-) {
-    handleDatabaseActions()
-    val scope = rememberCoroutineScope()
-    LaunchedEffect(action) {
-        if (action != Action.NoAction) {
-            scope.launch {
-                val result = scaffoldState.showSnackbar(
-                    message = "${action.name}: $taskTitle",
-                    actionLabel = "OK"
-                )
-                when (result) {
-                    SnackbarResult.ActionPerformed -> {
-
-                    }
-
-                    SnackbarResult.Dismissed -> {
-                    }
-                }
-            }
-        }
-    }
-}
+//
+//@Composable
+//fun DisplaySnackBar(
+//    scaffoldState: SnackbarHostState,
+//    handleDatabaseActions: () -> Unit,
+//    taskTitle: String,
+//    action: Action
+//) {
+//    handleDatabaseActions()
+//    val scope = rememberCoroutineScope()
+//    LaunchedEffect(action) {
+//        if (action != Action.NoAction) {
+//            scope.launch {
+//                val result = scaffoldState.showSnackbar(
+//                    message = "${action.name}: $taskTitle",
+//                    actionLabel = "OK"
+//                )
+//                when (result) {
+//                    SnackbarResult.ActionPerformed -> {
+//
+//                    }
+//
+//                    SnackbarResult.Dismissed -> {
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 @Composable
 @Preview
