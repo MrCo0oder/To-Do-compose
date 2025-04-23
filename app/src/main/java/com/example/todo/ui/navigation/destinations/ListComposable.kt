@@ -9,11 +9,13 @@ import com.example.todo.ui.screens.list.ListScreen
 
 fun NavGraphBuilder.listComposable(
     navigateToTaskScreen: (Int) -> Unit,
+    navigateToSettingsScreen: () -> Unit,
     sharedViewModel: SharedViewModel
 ) {
     composable<Screen.ListScreen> {
         ListScreen(
             sharedViewModel = sharedViewModel,
+            navigateToSettingsScreen = navigateToSettingsScreen,
             navigateToTaskScreen = navigateToTaskScreen
         )
     }

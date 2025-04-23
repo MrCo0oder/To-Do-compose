@@ -1,5 +1,6 @@
 package com.example.todo.ui.screens
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.todo.data.models.Priority
@@ -39,6 +40,12 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
         searchAppBarState.value = topBarState
     }
 
+    private val _isDarkTheme = MutableStateFlow(false)
+    val isDarkTheme: StateFlow<Boolean> = _isDarkTheme
+
+    fun setDarkTheme(isDarkTheme: Boolean) {
+        _isDarkTheme.value = isDarkTheme
+    }
 
     fun getAllTasks() {
         _allTasks.value = RequestState.Loading
@@ -81,6 +88,7 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
     fun searchDatabase(searchQuery: String) {
         _searchTasks.value = RequestState.Loading
         try {
+            Log.d("searchDatabase: ", searchQuery)
             viewModelScope.launch {
                 repository.searchDatabase("%$searchQuery%").collect { searchTasks ->
                     _searchTasks.value = RequestState.Success(searchTasks)
@@ -100,12 +108,13 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
         try {
             viewModelScope.launch {
                 repository.getSelectedTask(taskId).collect { tasks ->
-                    _task.value = RequestState.Success(tasks)
+                        _task.value = RequestState.Success(tasks)
                 }
             }
         } catch (e: Exception) {
             _task.value = RequestState.Error(e)
         }
+        Log.d("getSelectedTask: ", _task.value.toString())
     }
 
     fun sortByLowPriority() {
@@ -130,8 +139,9 @@ class SharedViewModel @Inject constructor(private val repository: ToDoRepository
         MutableStateFlow<ToDoTask?>(ToDoTask(title = "", description = "", priority = Priority.LOW))
     val taskFlow: StateFlow<ToDoTask?> = _selectedTask
 
-    fun setSelectedTask(toDoTask: ToDoTask?) {
+    fun setSelectedTask(toDoTask: ToDoTask) {
         _selectedTask.value = toDoTask
+        Log.d("setSelectedTask: ", toDoTask.toString())
     }
 
     fun onEvent(event: TaskScreenEvent) {

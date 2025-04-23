@@ -8,4 +8,7 @@ sealed class Screen {
 
     @Serializable
     data class TaskScreen(val id: Int = -1) : Screen()
+
+    @Serializable
+    data object SettingsScreen : Screen()
 }

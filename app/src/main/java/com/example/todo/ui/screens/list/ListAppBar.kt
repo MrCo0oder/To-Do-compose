@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -42,7 +43,8 @@ import com.example.todo.util.TopBarState
 fun ListAppBar(
     sharedViewModel: SharedViewModel,
     topBarState: TopBarState,
-    searchTextState: String
+    searchTextState: String,
+    onMenuClicked: () -> Unit = {},
 ) {
     when (topBarState) {
         TopBarState.CLOSED -> {
@@ -59,7 +61,8 @@ fun ListAppBar(
                 },
                 onDeleteAllClicked = {
                     sharedViewModel.deleteAllTasks()
-                }
+                },
+                onMenuClicked =onMenuClicked
             )
         }
 
@@ -83,7 +86,8 @@ fun ListAppBar(
 fun DefaultAppBar(
     onSearchClicked: () -> Unit = {},
     onSortClicked: (Priority) -> Unit = {},
-    onDeleteAllClicked: () -> Unit = {}
+    onDeleteAllClicked: () -> Unit = {},
+    onMenuClicked: () -> Unit = {}
 ) {
     TopAppBar(
         title = {
@@ -94,6 +98,15 @@ fun DefaultAppBar(
             titleContentColor = MaterialTheme.colorScheme.onPrimary,
             actionIconContentColor = MaterialTheme.colorScheme.onPrimary
         ),
+        navigationIcon = {
+            IconButton(onClick = onMenuClicked) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.List,
+                    contentDescription = "List Icon",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        },
         actions = {
             ListAppBarActions(
                 onSearchClicked,

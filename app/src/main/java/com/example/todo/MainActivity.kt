@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.todo.ui.navigation.AppNavigation
@@ -20,7 +21,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ToDoTheme {
+            val isDarkTheme = sharedViewModel.isDarkTheme.collectAsState().value
+            ToDoTheme(isDarkTheme) {
                 navController = rememberNavController()
                 AppNavigation(
                     navController,
